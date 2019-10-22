@@ -21,9 +21,11 @@ export function* signIn({ payload }) {
       toast.error('User is not a Provider');
       return;
     }
+
     api.defaults.headers.Authorization = `Bearer ${token}`;
 
     yield put(signInSuccess(token, user));
+
     history.push('/dashboard');
   } catch (err) {
     toast.error('Authentication Failure, check information provided.');
@@ -36,6 +38,7 @@ export function* signUp({ payload }) {
     const { name, email, password } = payload;
 
     yield call(api.post, '/users', { name, email, password, provider: true });
+    toast.success('Welcome to GoBarber Family!');
     history.push('/');
   } catch (err) {
     toast.error('Sign Up failure, please verify information provided.');
@@ -53,8 +56,13 @@ export function setToken({ payload }) {
   }
 }
 
+export function signOut() {
+  history.push('/');
+}
+
 export default all([
   takeLatest('persist/REHYDRATE', setToken),
   takeLatest('@auth/SIGN_IN_REQUEST', signIn),
   takeLatest('@auth/SIGN_UP_REQUEST', signUp),
+  takeLatest('@auth/SIGN_OUT', signOut),
 ]);
