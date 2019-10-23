@@ -27,7 +27,7 @@ export default function Header() {
                 profile.avatar.url ||
                 'https://api.adorable.io/avatars/120/abott@adorable.pngCopy'
               }
-              alt={profile.name}
+              alt=""
             />
           </Profile>
         </aside>

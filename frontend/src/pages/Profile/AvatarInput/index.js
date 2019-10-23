@@ -6,9 +6,21 @@ import { Container } from './styles';
 
 export default function AvatarInput() {
   const { defaultValue, registerField } = useField('avatar');
+
   const [file, setFile] = useState(defaultValue && defaultValue.id);
   const [preview, setPreview] = useState(defaultValue && defaultValue.url);
+
   const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) {
+      registerField({
+        name: 'avatar_id',
+        ref: ref.current,
+        path: 'dataset.file',
+      });
+    }
+  }, [ref]);
 
   async function handleChange(e) {
     const data = new FormData();
@@ -21,16 +33,6 @@ export default function AvatarInput() {
     setPreview(url);
   }
 
-  useEffect(() => {
-    if (ref.current) {
-      registerField({
-        name: 'avatar_id',
-        ref: ref.current,
-        path: 'dataset.file',
-      });
-    }
-  }, [ref, registerField]);
-
   return (
     <Container>
       <label htmlFor="avatar">
@@ -39,7 +41,7 @@ export default function AvatarInput() {
             preview ||
             'https://api.adorable.io/avatars/120/abott@adorable.pngCopy'
           }
-          alt="avatar"
+          alt=""
         />
 
         <input
