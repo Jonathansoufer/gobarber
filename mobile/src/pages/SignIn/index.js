@@ -11,10 +11,10 @@ import {
   SignLinkText,
 } from './styles';
 
-export default function SignIn() {
+export default function SignIn({ navigation }) {
   return (
-    <Container>
-      <Background>
+    <Background>
+      <Container>
         <Image source={logo} />
         <Form>
           <FormInput
@@ -31,10 +31,10 @@ export default function SignIn() {
           />
           <SubmitButton onPress={() => {}}>Sign In</SubmitButton>
         </Form>
-        <SignLink onPress={() => {}}>
+        <SignLink onPress={() => navigation.navigate('SignUp')}>
           <SignLinkText>Sign Up</SignLinkText>
         </SignLink>
-      </Background>
-    </Container>
+      </Container>
+    </Background>
   );
 }
