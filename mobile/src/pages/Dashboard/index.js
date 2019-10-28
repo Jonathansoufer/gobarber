@@ -1,12 +1,56 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import { withNavigationFocus } from 'react-navigation';
+import api from '~/services/api';
 import Background from '~/components/Background';
-import { Container } from './styles';
+import Appointment from '../../components/Appointment';
 
-export default function Dashboard() {
-  return <Background />;
+import { Container, Title, List } from './styles';
+
+function Dashboard({ isFocused }) {
+  const [appointments, setAppointments] = useState([]);
+
+  async function loadAppointments() {
+    const response = await api.get('appointments');
+    setAppointments(response.data);
+  }
+
+  useEffect(() => {
+    if (isFocused) {
+      loadAppointments();
+    }
+  }, [isFocused]);
+
+  async function handleCancel(id) {
+    const response = await api.delete(`appointments/${id}`);
+
+    setAppointments(
+      appointments.map(appointment =>
+        appointment.id === id
+          ? {
+              ...appointment,
+              canceled_at: response.data.canceled_at,
+            }
+          : appointment
+      )
+    );
+    loadAppointments();
+  }
+
+  return (
+    <Background>
+      <Container>
+        <Title>Calendar</Title>
+        <List
+          data={appointments}
+          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) => (
+            <Appointment onCancel={() => handleCancel(item.id)} data={item} />
+          )}
+        />
+      </Container>
+    </Background>
+  );
 }
 
 Dashboard.navigationOptions = {
@@ -15,3 +59,5 @@ Dashboard.navigationOptions = {
     <Icon name="event" size={20} color={tintColor} />
   ),
 };
+
+export default withNavigationFocus(Dashboard);

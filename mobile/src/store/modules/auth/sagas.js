@@ -38,7 +38,7 @@ export function* signUp({ payload }) {
 
     yield call(api.post, '/users', { name, email, password });
     Alert.alert('Success', 'Welcome to GoBarber Family!');
-    history.push('/');
+    // history.push('/');
   } catch (err) {
     Alert.alert('Sign Up failure', 'Please verify information provided.');
     yield put(signFailure());
@@ -56,7 +56,7 @@ export function setToken({ payload }) {
 }
 
 export function signOut() {
-  history.push('/');
+  // history.push('/');
 }
 
 export default all([

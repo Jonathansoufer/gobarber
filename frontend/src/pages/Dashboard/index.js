@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   format,
   subDays,
@@ -7,47 +7,49 @@ import {
   setMinutes,
   setSeconds,
   isBefore,
-  isEqual,
   parseISO,
 } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import { utcToZonedTime } from 'date-fns-tz';
-import en from 'date-fns/locale/en-US';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
+import { isEqual } from 'date-fns/esm';
 import api from '~/services/api';
 
 import { Container, Time } from './styles';
 
-const range = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+const range = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 export default function Dashboard() {
-  const [schedule, setSchedule] = useState([]);
   const [date, setDate] = useState(new Date());
+  const [schedule, setSchedule] = useState([]);
 
   const dateFormatted = useMemo(
-    () => format(date, "d 'of' MMMM", { locale: en }),
+    () => format(date, 'MMMM d', { locale: enUS }),
     [date]
   );
 
   useEffect(() => {
     async function loadSchedule() {
-      const response = await api.get('/schedule', {
+      const response = await api.get('schedule', {
         params: { date },
       });
 
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       const data = range.map(hour => {
         const checkDate = setSeconds(setMinutes(setHours(date, hour), 0), 0);
-        const comparedDate = utcToZonedTime(checkDate, timezone);
+        const compareDate = utcToZonedTime(checkDate, timezone);
 
         return {
-          time: `${hour}:00h`,
-          past: isBefore(comparedDate, new Date()),
+          time: `${hour}h00`,
+          past: isBefore(compareDate, new Date()),
           appointment: response.data.find(a =>
-            isEqual(parseISO(a.date), comparedDate)
+            isEqual(parseISO(a.date), compareDate)
           ),
         };
       });
+
       setSchedule(data);
     }
     loadSchedule();
@@ -60,17 +62,19 @@ export default function Dashboard() {
   function handleNextDay() {
     setDate(addDays(date, 1));
   }
+
   return (
     <Container>
       <header>
         <button type="button" onClick={handlePrevDay}>
-          <MdChevronLeft size={36} color="#FFF" />
+          <MdChevronLeft size={36} color="#fff" />
         </button>
         <strong>{dateFormatted}</strong>
         <button type="button" onClick={handleNextDay}>
-          <MdChevronRight size={36} color="#FFF" />
+          <MdChevronRight size={36} color="#fff" />
         </button>
       </header>
+
       <ul>
         {schedule.map(time => (
           <Time key={time.time} past={time.past} available={!time.appointment}>
